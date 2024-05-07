@@ -12,6 +12,7 @@ export default class Options implements IOptions {
     this.cashOutJuridical = props.cashOutJuridical;
   }
 
+  // function for initialize options from API
   static async initialize() {
     const options = await Promise.all([
       api({

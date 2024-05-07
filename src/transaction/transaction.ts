@@ -1,4 +1,4 @@
-import { IOptions, ITransaction } from "../interfaces";
+import {IOptions, ITransaction, ITransactionWithoutFee} from "../interfaces";
 import { CASH_IN, CASH_OUT, JURIDICAL_USER, NATURAL_USER } from "../constants";
 import { calculateCommission } from "./transaction.services";
 import { getMonday, getSunday, inRange } from "./transaction.utils";
@@ -12,11 +12,13 @@ export default class Transaction {
     this.options = options;
   }
 
+  // Method to getting array of added transactions
   getTransactions(): ITransaction[] {
     return this.transactions;
   }
 
-  addTransaction(transaction: Omit<ITransaction, "fee">): ITransaction {
+  // Method to adding transaction to array
+  addTransaction(transaction: ITransactionWithoutFee): ITransaction {
     let fee: number;
     if (transaction.type === CASH_IN) {
       fee = this.getCashInCommission(transaction);
@@ -42,15 +44,17 @@ export default class Transaction {
     return newTransaction;
   }
 
-  private getCashInCommission(transaction: Omit<ITransaction, "fee">) {
+  // Method to calculating fee on cash_in operations
+  private getCashInCommission(transaction: ITransactionWithoutFee) {
     return calculateCommission(
       transaction.operation.amount,
       this.options.cashIn
     );
   }
 
+  // Method to calculating fee on cash_out operations for juridical users
   private getCashOutJuridicalUserCommission(
-    transaction: Omit<ITransaction, "fee">
+    transaction: ITransactionWithoutFee
   ) {
     return calculateCommission(
       transaction.operation.amount,
@@ -58,11 +62,15 @@ export default class Transaction {
     );
   }
 
+  // Method to calculating fee on cash_out operations for natural users
   private getCashOutNaturalUserCommission(
-    transaction: Omit<ITransaction, "fee">
+    transaction: ITransactionWithoutFee
   ) {
+    // Find start of week for current date
     const startWeek = getMonday(transaction.date);
+    // Find end of week for current date
     const endWeek = getSunday(transaction.date);
+    // Filter transactions inRange of startWeek and endWeek
     const filtered = this.transactions.filter(
       (item) =>
         inRange(item.date, startWeek, endWeek) &&
@@ -71,6 +79,7 @@ export default class Transaction {
         item.user_id === transaction.user_id
     );
 
+    // Calculate sum of amounts for current week
     const sum = filtered.reduce(
       (res, value) => res + value.operation.amount,
       0

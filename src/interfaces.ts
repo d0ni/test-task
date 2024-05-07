@@ -4,13 +4,15 @@ export interface IOperation {
 }
 
 export interface ITransaction {
-  date: Date;
+  date: string;
   user_id: number;
   user_type: 'natural' | 'juridical';
   type: 'cash_in' | 'cash_out';
   operation: IOperation;
   fee: number
 }
+
+export type ITransactionWithoutFee = Omit<ITransaction, "fee">;
 
 export interface IOption {
   percents: number,

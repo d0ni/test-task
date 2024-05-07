@@ -1,3 +1,6 @@
+/*
+Create instance of axios to calling options
+*/
 import axios, { AxiosRequestConfig } from "axios";
 
 const API_BASE_URL = process.env.API_BASE_URL;
